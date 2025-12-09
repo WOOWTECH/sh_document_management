@@ -15,7 +15,6 @@
     "data": [
         'security/sh_document_management_groups.xml',
         'security/ir.model.access.csv',
-        'wizard/sh_share_directories_views.xml',
         'views/ir_attachment_views.xml',
         'views/menus.xml',
         'views/document_tags_views.xml',
