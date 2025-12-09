@@ -31,7 +31,7 @@ class Directory(models.Model):
     parent_id = fields.Many2one('document.directory', 'Parent Directory')
     visible_directory = fields.Boolean(string='Visible Directory')
     directory_tag_ids = fields.Many2many(
-        'directory.tags', string='Diractory Tags')
+        'directory.tags', string='Directory Tags')
     attachment_ids = fields.One2many(
         'ir.attachment', 'directory_id', string=" Files")
     directory_ids = fields.Many2many(
