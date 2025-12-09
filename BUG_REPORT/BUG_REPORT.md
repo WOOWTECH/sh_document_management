@@ -20,7 +20,7 @@ Let user download the file.
 
 - Reference `Bug_1_screenshot_2.png`.
 
-## Bug 2
+## Bug 2 (SOLVED)
 
 ### Test step 
 
