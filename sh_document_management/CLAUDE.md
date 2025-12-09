@@ -19,7 +19,7 @@
 ### Basic Information
 - **Name**: Document Management
 - **Technical Name**: sh_document_management
-- **Version**: 0.0.1
+- **Version**: 0.0.2
 - **Author**: Softhealer Technologies
 - **License**: OPL-1
 - **Category**: Document Management
@@ -1408,5 +1408,5 @@ This document provides a comprehensive overview of the `sh_document_management` 
 
 **Document Version**: 1.0
 **Last Updated**: 2025-12-08
-**Module Version**: 0.0.1
+**Module Version**: 0.0.2
 **Odoo Version**: 18.0

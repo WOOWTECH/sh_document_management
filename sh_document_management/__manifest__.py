@@ -9,7 +9,7 @@
     "category": "Document Management",
     "summary": "View  Document Module, Filter Document,Document Management,Manage Doc Group By Document, Get Document Details, Document Manage, Manage Directory Document Odoo",
     "description": """This module helps to manage documents easily in odoo. You can create the directory and manage directory wise documents. Users can filter the documents by visible directory & my directory. You can easily group by the documents by directory, custom date & created by. You can easily add custom filters/groups of documents. From the menu bar, the user can see directory tags & document tags. Using a search bar you can search documents details easily. You can download the document from the files in the directory. You can see related documents from the sub-directory.""",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "depends": ["base", "mail","web"],
     "application": True,
     "data": [
