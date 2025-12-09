@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Softhealer Technologies.
 # BUG-002 Fix: Auto-detect public URLs for document sharing
+# FIX-006: Force HTTPS for public URLs (Cloudflare/proxy requirement)
 
 import ipaddress
 import logging
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 from odoo import models, api
 
 _logger = logging.getLogger(__name__)
@@ -26,6 +27,9 @@ class IrConfigParameterInherit(models.Model):
             )
 
             if is_public:
+                # FIX-006: Force HTTPS for public URLs (Cloudflare/proxy requirement)
+                public_url = self._ensure_https(value)
+
                 # Use super() call to bypass our override and prevent recursion
                 old_public = super(IrConfigParameterInherit, self).sudo().search([
                     ('key', '=', 'sh_document_management.public_base_url')
@@ -33,12 +37,12 @@ class IrConfigParameterInherit(models.Model):
 
                 super(IrConfigParameterInherit, self).sudo().set_param(
                     'sh_document_management.public_base_url',
-                    value
+                    public_url
                 )
 
                 _logger.info(
                     f"Updated sh_document_management.public_base_url: "
-                    f"{old_public} -> {value}"
+                    f"{old_public} -> {public_url}"
                 )
 
         return result
@@ -57,10 +61,13 @@ class IrConfigParameterInherit(models.Model):
                 )
 
                 if is_public:
+                    # FIX-006: Force HTTPS for public URLs
+                    public_url = self._ensure_https(vals['value'])
+
                     # Use super() to avoid recursion
                     super(IrConfigParameterInherit, self).sudo().set_param(
                         'sh_document_management.public_base_url',
-                        vals['value']
+                        public_url
                     )
 
         return result
@@ -111,3 +118,25 @@ class IrConfigParameterInherit(models.Model):
         except Exception as e:
             _logger.warning(f"Invalid URL in _is_public_url: {url} - {e}")
             return False
+
+    @api.model
+    def _ensure_https(self, url):
+        """
+        FIX-006: Force HTTPS for public URLs.
+        Cloudflare tunnels and most proxies use HTTPS, so public share links
+        must use HTTPS to avoid redirect issues.
+        """
+        if not url:
+            return url
+
+        try:
+            parsed = urlparse(url)
+            if parsed.scheme == 'http':
+                # Replace http with https
+                https_url = urlunparse(parsed._replace(scheme='https'))
+                _logger.info(f"Upgraded URL to HTTPS: {url} -> {https_url}")
+                return https_url
+            return url
+        except Exception as e:
+            _logger.warning(f"Error upgrading URL to HTTPS: {url} - {e}")
+            return url

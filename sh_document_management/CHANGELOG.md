@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.6] - 2025-12-09
+
+### Fixed
+
+#### FIX-006: Force HTTPS for Public Share URLs
+- **Issue**: Share email download links used `http://` protocol but Cloudflare Tunnel uses `https://`, causing browser redirect issues when clicking download links (page opens and closes immediately)
+- **Root Cause**: Auto-detected public URL preserved `http://` scheme from `web.base.url`, but Cloudflare enforces HTTPS
+- **Solution**: Automatically upgrade public URLs from `http://` to `https://` when saving to `sh_document_management.public_base_url`
+- **Changes**:
+  - Added `_ensure_https()` method in `ir_config_parameter.py`
+  - Applied HTTPS enforcement in both `set_param()` and `write()` overrides
+  - Updated `post_init_hook` to upgrade existing HTTP URLs to HTTPS on module upgrade
+- **Affected Files**:
+  - `models/ir_config_parameter.py` (new `_ensure_https()` method)
+  - `__init__.py` (post_init_hook upgrade logic)
+  - `__manifest__.py` (version bump to 0.0.6)
+
+---
+
 ## [0.0.5] - 2025-12-09
 
 ### Fixed
@@ -169,6 +188,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Upgrade Notes
+
+### Upgrading from 0.0.5 to 0.0.6
+
+1. **Backup**: Create a database backup before upgrading
+2. **Update Module**: Click "Update" in Apps menu or run `-u sh_document_management`
+3. **Automatic HTTPS Upgrade**: The module will automatically upgrade existing `http://` public URLs to `https://` during module update
+4. **Verification**:
+   - Go to Settings → Technical → Parameters → System Parameters
+   - Search for `sh_document_management.public_base_url`
+   - Should now show `https://` prefix (e.g., `https://woowtech-testodoo.woowtech.io`)
+5. **Test**: Share a document and verify the download link works correctly
 
 ### Upgrading from 0.0.4 to 0.0.5
 
