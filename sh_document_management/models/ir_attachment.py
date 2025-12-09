@@ -23,11 +23,14 @@ class Attachment(models.Model):
         string="Link", compute='_compute_full_url')
 
     def _compute_full_url(self):
-        base_url = self.env['ir.config_parameter'].sudo(
-        ).get_param('web.base.url')
-        self.sh_share_url = base_url + '/attachment/download_directories' + \
-            '?list_ids=%s&access_token=%s&name=%s' % (
-                self.id, self.access_token, 'document')
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        for record in self:
+            # Generate access token if not exists (Odoo base method)
+            if not record.access_token:
+                record.generate_access_token()
+            record.sh_share_url = base_url + '/attachment/download_directories' + \
+                '?list_ids=%s&access_token=%s&name=%s' % (
+                    record.id, record.access_token, 'document')
 
     def action_share_directory(self):
         self._compute_full_url()
