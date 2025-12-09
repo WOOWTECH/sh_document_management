@@ -11,5 +11,3 @@ My Odoo server is installed in the same Docker environment as the Home Assistant
 ## SSH to Home Assistant
 
 - Command : ssh ha-192-168-2-6
-- Login user name : admin
-- Login password : woowtech
