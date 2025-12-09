@@ -23,7 +23,10 @@ class Attachment(models.Model):
         string="Link", compute='_compute_full_url')
 
     def _compute_full_url(self):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        IrConfig = self.env['ir.config_parameter'].sudo()
+        # Use auto-detected public URL, fall back to web.base.url (BUG-002 fix)
+        base_url = IrConfig.get_param('sh_document_management.public_base_url') or \
+                   IrConfig.get_param('web.base.url')
         for record in self:
             # Generate access token if not exists (Odoo base method)
             if not record.access_token:

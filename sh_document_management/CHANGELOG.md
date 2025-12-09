@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.5] - 2025-12-09
+
+### Fixed
+
+#### BUG-002: Share URL Shows Local Address (Auto-Detection Fix)
+- **Issue**: Share email download links showed local IP (192.168.2.6) instead of public URL when admin logged in via local IP
+- **Root Cause**: `web.base.url` auto-updates on every admin login; local login overwrites public URL with local IP
+- **Solution**: Implemented intelligent auto-detection system that:
+  1. Monitors `web.base.url` changes via `ir.config_parameter` model inheritance
+  2. Automatically detects if URL is public (domain/public IP) vs private (192.168.x.x, 10.x.x.x, etc.)
+  3. Saves public URLs to `sh_document_management.public_base_url` parameter
+  4. Share URLs always use the saved public URL (with fallback to `web.base.url`)
+- **User Experience**: Zero manual configuration required - system learns public URL automatically
+- **Private IP Detection**: Rejects 10.x.x.x, 172.16-31.x.x, 192.168.x.x, localhost, .local domains
+- **Affected Files**:
+  - `models/ir_config_parameter.py` (new file - auto-detection logic)
+  - `models/__init__.py` (import new model)
+  - `__init__.py` (post_init_hook for initialization)
+  - `models/ir_attachment.py` (use public_base_url)
+  - `models/document_directory.py` (use public_base_url)
+  - `__manifest__.py` (version, post_init_hook)
+
+---
+
 ## [0.0.4] - 2025-12-09
 
 ### Fixed
@@ -145,6 +169,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Upgrade Notes
+
+### Upgrading from 0.0.4 to 0.0.5
+
+1. **Backup**: Create a database backup before upgrading
+2. **Update Module**: Click "Update" in Apps menu or run `-u sh_document_management`
+3. **First Public Login Required**: After upgrade, login via public URL once to trigger auto-detection
+4. **Verification** (optional):
+   - Go to Settings → Technical → Parameters → System Parameters
+   - Search for `sh_document_management.public_base_url`
+   - Should contain your public URL (e.g., `https://woowtech-testodoo.woowtech.io`)
+5. **Test**: Share a document and verify email contains public URL
 
 ### Upgrading from 0.0.3 to 0.0.4
 

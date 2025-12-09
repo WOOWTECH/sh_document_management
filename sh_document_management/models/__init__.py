@@ -5,3 +5,4 @@ from . import directory_tags
 from . import document_tags
 from . import document_directory
 from . import ir_attachment
+from . import ir_config_parameter

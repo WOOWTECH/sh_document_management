@@ -80,8 +80,10 @@ class Directory(models.Model):
             return sh_access_token
 
     def _compute_full_url(self):
-        base_url = self.env['ir.config_parameter'].sudo(
-        ).get_param('web.base.url')
+        IrConfig = self.env['ir.config_parameter'].sudo()
+        # Use auto-detected public URL, fall back to web.base.url (BUG-002 fix)
+        base_url = IrConfig.get_param('sh_document_management.public_base_url') or \
+                   IrConfig.get_param('web.base.url')
         self.sh_share_url = base_url + '/attachment/download_directories' + \
             '?list_ids=%s&access_token=%s&name=%s' % (
                 self.id, self._get_token(), 'directory')
