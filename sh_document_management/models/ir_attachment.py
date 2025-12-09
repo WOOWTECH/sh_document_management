@@ -5,10 +5,7 @@ import random
 import base64
 import zipfile
 from io import BytesIO
-import tempfile
-import shutil
-import os
-from odoo import models, fields, api,_
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
@@ -92,65 +89,38 @@ class Attachment(models.Model):
         return super(Attachment, self).create(vals_list)
 
     def action_download_as_zip_attachment(self):
+        """Export only selected attachments as ZIP (not entire directories)"""
         if self.env.context.get('active_ids'):
             attachment_ids = self.env['ir.attachment'].sudo().browse(
                 self.env.context.get('active_ids'))
-            directories = []
+
             if attachment_ids:
-                for attachment in attachment_ids:
-                    if attachment.directory_id and attachment.directory_id.id not in directories:
-                        directories.append(attachment.directory_id.id)
-            directory_ids = self.env['document.directory'].sudo().browse(
-                directories)
-            if directory_ids:
                 mem_zip = BytesIO()
-                tmp_dir = tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
-                path = tmp_dir
-                path_main = tempfile.gettempdir()
-                is_exist = os.path.exists(path_main)
-                if not is_exist:
-                    os.mkdir(path_main)
-                path_ED = path_main
-                # path_ID = tmp_dir
                 with zipfile.ZipFile(mem_zip,
                                      mode="w",
                                      compression=zipfile.ZIP_DEFLATED) as zf:
-                    for directory in directory_ids:
-                        path = os.path.join(path_ED, directory.name)
-                        is_exist = os.path.exists(path)
-                        if not is_exist:
-                            os.mkdir(path)
-                        documents = self.env['ir.attachment'].sudo().search(
-                            [('directory_id', '=', directory.id)])
-                        if documents:
-                            for attachment in documents:
-                                # if bill then only export attachment.
-                                attachment_name = attachment.name.replace(
-                                    '/', '_') if attachment.name else 'attachment'
-                                f = open(path + "/" + attachment_name,
-                                         "wb")  # create
-                                content_base64 = base64.b64decode(
-                                    attachment.datas)
-                                f.write(content_base64)
-                                f.close()
-                                zf.write(path + "/" + attachment_name)
+                    for attachment in attachment_ids:
+                        if attachment.datas:
+                            # Sanitize filename - replace / with _ to avoid path issues
+                            file_name = attachment.name.replace('/', '_') if attachment.name else 'attachment'
+                            content = base64.b64decode(attachment.datas)
+                            zf.writestr(file_name, content)
 
                 content = base64.encodebytes(mem_zip.getvalue())
                 if content:
                     get_attachment = self.env['ir.attachment'].sudo().create({
-                        'name':'Documents.zip',
-                        'sh_document_as_zip':True,
-                        'type':'binary',
-                        'mimetype':'application/zip',
-                        'datas':content
+                        'name': 'Documents.zip',
+                        'sh_document_as_zip': True,
+                        'type': 'binary',
+                        'mimetype': 'application/zip',
+                        'datas': content
                     })
-                shutil.rmtree(tmp_dir)
-                url = "/web/content/" + str(get_attachment.id) + "?download=true"
-                return {
-                    'type': 'ir.actions.act_url',
-                    'url': url,
-                    'target': 'current',
-                }
+                    url = "/web/content/" + str(get_attachment.id) + "?download=true"
+                    return {
+                        'type': 'ir.actions.act_url',
+                        'url': url,
+                        'target': 'current',
+                    }
 
     def action_document_preview(self):
         self.ensure_one()
