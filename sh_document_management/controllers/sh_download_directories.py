@@ -12,9 +12,21 @@ logger = logging.getLogger(__name__)
 class ShDocumentCustomerPortal(http.Controller):
 
     @http.route(['/attachment/download_directiries',], type='http', auth='public', website=False, csrf=False)
-    def sh_download_directiries(self, list_ids='', name='', **post):
+    def sh_download_directiries(self, list_ids='', access_token='', name='', **post):
         """Controller to download share document from click on the click to download button from the email"""
-        if not list_ids:
+        if not list_ids or not access_token:
+            return request.not_found()
+
+        # Validate access token based on type
+        if name == 'directory':
+            record = request.env['document.directory'].sudo().browse(int(list_ids))
+            if not record.exists() or record.sh_access_token != access_token:
+                return request.not_found()
+        elif name == 'document':
+            record = request.env['ir.attachment'].sudo().browse(int(list_ids))
+            if not record.exists() or record.access_token != access_token:
+                return request.not_found()
+        else:
             return request.not_found()
         stream = io.BytesIO()
         try:
