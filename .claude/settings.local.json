@@ -6,7 +6,9 @@
       "Bash(git stash drop:*)",
       "mcp__chrome-devtools__list_pages",
       "mcp__chrome-devtools__navigate_page",
-      "mcp__chrome-devtools__select_page"
+      "mcp__chrome-devtools__select_page",
+      "Bash(ssh:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

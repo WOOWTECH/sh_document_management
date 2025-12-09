@@ -1,6 +1,6 @@
 # Bug Report
 
-## Bug 1
+## Bug 1 (SOLVED)
 
 ### Test step 
 
@@ -24,21 +24,31 @@ Let user download the file.
 
 ### Test step 
 
-1. In `All Documents` page click any document.
-2. Assign user to document.
-3. Click save.
-4. Click share icon.
-5. User receive an email including `Download Attachmet URL`.
-6. User click `Download Attachmet URL`
-
-- Reference `Bug_2_screenshot_1.png` and `Bug_2_screenshot_2.png`.
+1. Login with local URL.
+2. Assign user to document, and then click share icon.
+3. User receive an email including `Download Attachmet URL - before`.
+4. Re-login with remote URL.
+5. Assign user to document, and then click share icon.
+6. User receive an email including `Download Attachmet URL - after`.
 
 ### Expected behavior
 
-Create remote URL download link for user.
+Create remote URL download link for user correctly.
 
-### Actual behavior
+### Actual behavior - `Download Attachmet URL - before`
 
-Somehow the URL is showing the local address instead of a remote URL. If I manually change the local address to remote URL, the file can be downloaded normally.
+- As expected, the link is using local URL.
 
-- Reference `Bug_2_screenshot_3.png`.
+```html
+    <a style="font-weight:bold;text-decoration:None" href="http://192.168.2.6/attachment/download_directories?list_ids=1396&amp;access_token=a84e9293-9bc3-476e-93fa-886dc64d142a&amp;name=document" target="_blank" data-saferedirecturl="https://www.google.com/url?q=http://192.168.2.6/attachment/download_directories?list_ids%3D1396%26access_token%3Da84e9293-9bc3-476e-93fa-886dc64d142a%26name%3Ddocument&amp;source=gmail&amp;ust=1765365728074000&amp;usg=AOvVaw3mKaflCPcSaR8LcqgjcD9A">Click To
+                                Download</a>
+```
+
+### Actual behavior - `Download Attachmet URL - after`
+
+- The linked content appears to be correct. But when I click the link, it open a new empty page and close it. 
+
+```html
+    <a style="font-weight:bold;text-decoration:None" href="http://woowtech-testodoo.woowtech.io/attachment/download_directories?list_ids=1396&amp;access_token=a84e9293-9bc3-476e-93fa-886dc64d142a&amp;name=document" target="_blank" data-saferedirecturl="https://www.google.com/url?q=http://woowtech-testodoo.woowtech.io/attachment/download_directories?list_ids%3D1396%26access_token%3Da84e9293-9bc3-476e-93fa-886dc64d142a%26name%3Ddocument&amp;source=gmail&amp;ust=1765365835531000&amp;usg=AOvVaw1eyVNVWuANLx-bJC3m24FJ">Click To
+                                Download</a>
+```                      
