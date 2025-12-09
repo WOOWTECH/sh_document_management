@@ -36,7 +36,7 @@
                 <field name="name"/>
                 <templates>
                     <t t-name="kanban-menu">
-                        <a role="menuitem" class="dropdown-item" t-att-href="'/web/content/' + record.id.raw_value + '?download=true'">Download</a>
+                        <button type="object" name="action_download" class="dropdown-item">Download</button>
                         <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
                     </t>
                     <t t-name="kanban-box">

@@ -125,6 +125,18 @@ class Attachment(models.Model):
                         'target': 'current',
                     }
 
+    def action_download(self):
+        """Download attachment file - BUG-001 fix
+        Uses ir.actions.act_url to properly trigger download without
+        Odoo 18 kanban menu intercepting the action as an Odoo action.
+        """
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%s?download=true' % self.id,
+            'target': 'self',
+        }
+
     def action_document_preview(self):
         self.ensure_one()
         if self.type == 'url':

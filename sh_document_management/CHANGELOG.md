@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.4] - 2025-12-09
+
+### Fixed
+
+#### BUG-001: Download Action in Kanban View (Final Fix)
+- **Issue**: Clicking "Download" in document kanban dropdown still showed "Missing Action content" error
+- **Root Cause**: Odoo 18's kanban menu system intercepts ALL anchor tag clicks inside `<t t-name="kanban-menu">` and tries to interpret them as Odoo actions, parsing "content" from `/web/content/...` as an action name
+- **Solution**: Changed from `<a href>` to `<button type="object" name="action_download">` which properly returns an `ir.actions.act_url` action
+- **Affected Files**:
+  - `models/ir_attachment.py` (new `action_download()` method)
+  - `views/ir_attachment_views.xml` (line 39: changed anchor to button)
+
+#### BUG-002: Share URL Shows Local Address (Configuration Fix)
+- **Issue**: Share email download link showed local IP (192.168.2.6) instead of public URL
+- **Root Cause**: Cloudflare Tunnel doesn't pass `X-Forwarded-Host` header to Odoo, preventing auto-detection of public URL
+- **Solution**: Configure Cloudflare Tunnel HTTP Host Header setting (no code change required)
+- **User Action Required**:
+  1. Go to Cloudflare Zero Trust Dashboard → Networks → Tunnels
+  2. Edit hostname configuration for your Odoo domain
+  3. Under HTTP Settings, set "HTTP Host Header" to your public domain
+  4. Save and re-login to Odoo as admin to trigger `web.base.url` auto-update
+
+---
+
 ## [0.0.3] - 2025-12-09
 
 ### Fixed
@@ -121,6 +145,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Upgrade Notes
+
+### Upgrading from 0.0.3 to 0.0.4
+
+1. **Backup**: Create a database backup before upgrading
+2. **Update Module**: Click "Update" in Apps menu or run `-u sh_document_management`
+3. **No Data Migration Required**: All fixes are code-level improvements
+4. **Cloudflare Configuration** (for BUG-002):
+   - Go to Cloudflare Zero Trust Dashboard → Networks → Tunnels
+   - Edit hostname for your Odoo domain
+   - Under HTTP Settings, set "HTTP Host Header" to your public domain (e.g., `woowtech-testodoo.woowtech.io`)
+   - Save and re-login to Odoo as admin
 
 ### Upgrading from 0.0.2 to 0.0.3
 
