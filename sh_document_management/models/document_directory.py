@@ -120,7 +120,7 @@ class Directory(models.Model):
                 mem_zip = io.BytesIO()
                 tmp_dir = tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
                 path = tmp_dir
-                path_main = os.path.join('/tmp')
+                path_main = tempfile.gettempdir()
                 is_exist = os.path.exists(path_main)
                 if not is_exist:
                     os.mkdir(path_main)
