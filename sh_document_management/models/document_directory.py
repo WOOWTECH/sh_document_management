@@ -122,7 +122,7 @@ class Directory(models.Model):
         }
 
     @api.model
-    def _run_auto_delete_garbase_collection(self):
+    def _run_auto_delete_garbage_collection(self):
         attachment_ids = self.env['ir.attachment'].sudo().search(
             [('sh_document_as_zip', '=', True)])
         if attachment_ids:
