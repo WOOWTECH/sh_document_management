@@ -102,8 +102,24 @@ class Directory(models.Model):
                 count += 1
 
         template.partner_to = partner_to
+        # Get email sender with fallback (FIX-005)
+        email_from = self.env.user.email or self.env.user.partner_id.email or \
+            self.env['ir.mail_server'].sudo().search([], limit=1).smtp_user or \
+            'noreply@example.com'
         template.sudo().send_mail(self.id, force_send=True, email_values={
-            'email_from': self.env.user.email}, email_layout_xmlid='mail.mail_notification_light')
+            'email_from': email_from}, email_layout_xmlid='mail.mail_notification_light')
+
+        # Return notification action (FIX-003)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Share Email Sent'),
+                'message': _('Directory share link has been sent to the selected users.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     @api.model
     def _run_auto_delete_garbase_collection(self):
