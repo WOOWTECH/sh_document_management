@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 class ShDocumentCustomerPortal(http.Controller):
 
-    @http.route(['/attachment/download_directiries',], type='http', auth='public', website=False, csrf=False)
-    def sh_download_directiries(self, list_ids='', access_token='', name='', **post):
+    @http.route(['/attachment/download_directories', '/attachment/download_directiries'], type='http', auth='public', website=False, csrf=False)
+    def sh_download_directories(self, list_ids='', access_token='', name='', **post):
         """Controller to download share document from click on the click to download button from the email"""
         if not list_ids or not access_token:
             return request.not_found()

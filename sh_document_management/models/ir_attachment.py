@@ -28,7 +28,7 @@ class Attachment(models.Model):
     def _compute_full_url(self):
         base_url = self.env['ir.config_parameter'].sudo(
         ).get_param('web.base.url')
-        self.sh_share_url = base_url + '/attachment/download_directiries' + \
+        self.sh_share_url = base_url + '/attachment/download_directories' + \
             '?list_ids=%s&access_token=%s&name=%s' % (
                 self.id, self.access_token, 'document')
 
