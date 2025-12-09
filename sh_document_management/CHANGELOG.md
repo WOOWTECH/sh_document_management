@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.3] - 2025-12-09
+
+### Fixed
+
+#### BUG-001: Download Action in Kanban View
+- **Issue**: Clicking "Download" in document kanban dropdown showed "Missing Action datas" error
+- **Cause**: Anchor tag href pattern `/web/content/ir.attachment/{id}/datas?download=true` was intercepted by Odoo 18 JS framework as an action call instead of a direct URL
+- **Solution**: Changed href format to use simpler `/web/content/{id}?download=true` pattern
+- **Affected Files**:
+  - `views/ir_attachment_views.xml` (line 39)
+
+#### BUG-002: Share URL Returns 404
+- **Issue**: Share email download link returned 404 Not Found when clicked
+- **Cause**: Access token was not generated before creating share URL; `access_token` field was empty/None
+- **Solution**: Added `generate_access_token()` call before computing share URL to ensure token exists
+- **Affected Files**:
+  - `models/ir_attachment.py` (lines 25-33)
+
+---
+
 ## [0.0.2] - 2025-12-09
 
 ### Fixed
@@ -101,6 +121,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Upgrade Notes
+
+### Upgrading from 0.0.2 to 0.0.3
+
+1. **Backup**: Create a database backup before upgrading
+2. **Update Module**: Click "Update" in Apps menu or run `-u sh_document_management`
+3. **No Data Migration Required**: All fixes are code-level improvements
+4. **Share Links**: Existing share links may need to be regenerated (access tokens will be created on first share)
 
 ### Upgrading from 0.0.1 to 0.0.2
 

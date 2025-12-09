@@ -5,7 +5,7 @@ You are an Odoo 18 expert and project orchestrator. Help me complete the followi
 ## Tasks
 
 ### Task 1 - Create Fix Plan
-Analyze BUG_REPORT.md and create fix plan. Fix should have achievable milestones which have formatted tag ID for each agent. For example, frontend agent task 001 should be formatted as FRONTEND-T001. After each agent task finished, write the agent task report to `MASTER_TASK.md` and commit to git. If our token near the auto-compact threshold for example 10%, you need to record what you are doing in the same PROGRESS_[agent_name].md. This markdown will track what you're doing.
+Analyze `BUG_REPORT.md` and create `BUG_FIX_PLAN.md`. Fix should have achievable milestones which have formatted tag ID for each agent. For example, frontend agent task 001 should be formatted as FRONTEND-T001. After each agent task finished, write the agent task report to `MASTER_TASK.md` and commit to git. If our token near the auto-compact threshold for example 10%, you need to record what you are doing in the same PROGRESS_[agent_name].md. This markdown will track what you're doing.
 
 ### Task 2 - Review Fix Plan
 Review the fix plan. Your target is not just compile it without error. The criteria is that all functions of the `sh_document_management` module are 100% working correctly in Live Odoo 18 Instance. So please write about the testing case, too.

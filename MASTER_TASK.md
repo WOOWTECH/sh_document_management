@@ -18,6 +18,9 @@
 | IMP-T001 | Implement Fixes | COMPLETED | 2025-12-08 | 2025-12-08 | 10 commits on dev branch |
 | DEP-T001 | Deployment Testing | COMPLETED | 2025-12-09 | 2025-12-09 | All fixes verified on live instance |
 | DOC-T001 | Version Update & Changelog | COMPLETED | 2025-12-09 | 2025-12-09 | Version 0.0.2, CHANGELOG.md created |
+| BACKEND-T001 | Create Bug Fix Plan v0.0.3 | COMPLETED | 2025-12-09 | 2025-12-09 | BUG_FIX_PLAN.md for 2 new bugs |
+| BACKEND-T002 | Review Bug Fix Plan | COMPLETED | 2025-12-09 | 2025-12-09 | Test cases defined |
+| BACKEND-T003 | Implement Bug Fixes | COMPLETED | 2025-12-09 | 2025-12-09 | 2 bugs fixed, version 0.0.3 |
 
 ---
 
@@ -195,12 +198,68 @@
 
 ---
 
+### BACKEND-T001: Create Bug Fix Plan v0.0.3
+**Status:** COMPLETED
+**Started:** 2025-12-09
+**Completed:** 2025-12-09
+**Description:** Analyze BUG_REPORT.md and create fix plan for 2 new bugs.
+
+**Bugs Analyzed:**
+| Bug ID | Description | Severity |
+|--------|-------------|----------|
+| BUG-001 | Download action shows "Missing Action datas" error | High |
+| BUG-002 | Share URL returns 404 Not Found | High |
+
+**Deliverables:**
+- [x] `BUG_REPORT/BUG_FIX_PLAN.md` created
+
+**Root Cause Analysis:**
+1. **BUG-001**: Kanban dropdown href pattern was intercepted by Odoo 18 JS framework as action call
+2. **BUG-002**: Access token not generated before creating share URL
+
+---
+
+### BACKEND-T002: Review Bug Fix Plan
+**Status:** COMPLETED
+**Started:** 2025-12-09
+**Completed:** 2025-12-09
+**Description:** Review fix plan and define test cases.
+
+**Test Cases Defined:**
+- BUG-001: Download from kanban dropdown works without error
+- BUG-002: Share email link downloads file successfully
+
+**Acceptance Criteria:**
+- [x] No "Missing Action" error on download
+- [x] Share URL returns file (not 404)
+- [x] No regression in existing functionality
+
+---
+
+### BACKEND-T003: Implement Bug Fixes
+**Status:** COMPLETED
+**Started:** 2025-12-09
+**Completed:** 2025-12-09
+**Description:** Implement fixes for BUG-001 and BUG-002.
+
+**Changes Made:**
+| File | Change |
+|------|--------|
+| `views/ir_attachment_views.xml` | Fixed download href pattern (line 39) |
+| `models/ir_attachment.py` | Added access token generation (lines 25-33) |
+| `__manifest__.py` | Version updated to 0.0.3 |
+| `CHANGELOG.md` | Added v0.0.3 section |
+
+**Version Update:** 0.0.2 -> 0.0.3
+
+---
+
 ## Project Completion Summary
 
-**Project Status:** COMPLETED
-**Completion Date:** 2025-12-09
+**Project Status:** IN PROGRESS (v0.0.3 pending deployment test)
+**Last Update:** 2025-12-09
 
-### Achievements
+### Achievements (v0.0.2)
 - Created comprehensive documentation (CLAUDE.md) for module and environment
 - Conducted 17 functional tests on live Odoo 18 instance
 - Identified and fixed 10 issues across the codebase
@@ -208,14 +267,16 @@
 - Added cross-platform compatibility (Windows/Linux/macOS)
 - Enhanced security with token validation
 - Improved user experience with share notifications
-- Updated module version to 0.0.2
 
-### Final Module State
-- **Version:** 0.0.2
-- **All Tests:** PASSING
-- **All Fixes:** VERIFIED
+### Achievements (v0.0.3)
+- Fixed download action "Missing Action datas" error in kanban view
+- Fixed share URL 404 error by adding access token generation
+
+### Current Module State
+- **Version:** 0.0.3
+- **Pending:** Deployment testing for v0.0.3
 - **Documentation:** COMPLETE
-- **Ready for Production:** YES
+- **Ready for Production:** After deployment test passes
 
 ---
 
