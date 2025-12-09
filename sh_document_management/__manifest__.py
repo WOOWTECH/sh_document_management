@@ -21,7 +21,7 @@
         'views/document_tags_views.xml',
         'views/directory_tags_views.xml',
         'views/document_directory_views.xml',
-        'data/ir_crom_data.xml',
+        'data/ir_cron_data.xml',
         'data/mail_template_data.xml',
     ],
 
