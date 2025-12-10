@@ -8,7 +8,9 @@
       "mcp__chrome-devtools__navigate_page",
       "mcp__chrome-devtools__select_page",
       "Bash(ssh:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git tag:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

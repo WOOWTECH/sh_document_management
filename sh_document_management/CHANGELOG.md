@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0] - 2025-12-10
+
+### Stable Release
+
+This release consolidates all bug fixes and improvements from the 0.0.x development series into the first stable version.
+
+#### Includes All Previous Fixes
+- **FIX-001** through **FIX-010**: Various bug fixes and improvements
+- **BUG-001** and **BUG-002**: Download action and share URL fixes
+- HTTPS enforcement for public share URLs
+- Auto-detection of public URL for document sharing
+- Cross-platform compatibility (Windows/Linux/macOS)
+
+#### Tested and Verified
+- All sharing functionality tested with Cloudflare Tunnel
+- ZIP export working correctly on all platforms
+- Public download links with proper HTTPS URLs
+- Email notifications working with correct URLs
+
+---
+
 ## [0.0.6] - 2025-12-09
 
 ### Fixed
@@ -188,6 +209,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Upgrade Notes
+
+### Upgrading to 0.1.0 (Stable Release)
+
+1. **Backup**: Create a database backup before upgrading
+2. **Update Module**: Click "Update" in Apps menu or run `-u sh_document_management`
+3. **No Data Migration Required**: All fixes are code-level improvements
+4. **Verification**: Test sharing functionality to ensure URLs work correctly
 
 ### Upgrading from 0.0.5 to 0.0.6
 
