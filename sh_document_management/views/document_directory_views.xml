@@ -8,11 +8,11 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button type="object" name="action_view_files" class="oe_stat_button"
-                            icon="fa-file" title="Files">
+                            icon="oi-doc" title="Files">
                             <field name="files" widget="statinfo" string="Files" />
                         </button>
                         <button type="object" name="action_view_sub_directory"
-                            class="oe_stat_button" icon="fa-folder">
+                            class="oe_stat_button" icon="oi-folder">
                             <field name="sub_directories" widget="statinfo" string="Sub Directories" />
                         </button>
                     </div>
@@ -147,14 +147,14 @@
                                 <div>
                                     <button type="object" name="action_view_files"
                                         class="btn btn-primary me-2">
-                                        <field name="files" widget="statinfo" string=" Files">
-                                            <i class="fa fa-file" title=" Files" />
-                                        </field>
+                                        <i class="oi oi-doc me-1" title="Files" />
+                                        <field name="files" widget="statinfo" string="Files" />
                                     </button>
                                     <button type="object" name="action_view_sub_directory"
-                                        icon="fa-folder" class="btn btn-primary ms-2">
+                                        class="btn btn-primary ms-2">
+                                        <i class="oi oi-folder me-1" title="Sub Directories" />
                                         <field name="sub_directories" widget="statinfo"
-                                            string=" Sub Directories" />
+                                            string="Sub Directories" />
                                     </button>
                                 </div>
                             </div>

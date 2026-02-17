@@ -7,35 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.3.1] - 2026-02-17
+## [0.3.2] - 2026-02-17
 
-### Portal UI Redesign
+### UI Icon Update
 
-Complete visual redesign of Portal document pages with a minimal, clean aesthetic inspired by Notion, Linear, and Dropbox Paper.
+Updated backend Document views to use Odoo's native OI (Odoo Icons) instead of FontAwesome icons for better visual consistency.
 
-#### Design Changes
-- **Typography**: System font stack for crisp rendering, refined heading weights
-- **Color Palette**: Neutral cool gray scale with subtle blue accent
-- **Icons**: Reduced from fa-2x/fa-3x (32-48px) to 16px - properly sized for content-first design
-- **Layout**: Generous whitespace, content-focused hierarchy
-- **Components**:
-  - Directory cards: Compact cards with subtle borders (no heavy shadows)
-  - File rows: Clean list-style with hover-reveal actions
-  - Breadcrumb: Simple text separator style
-  - Empty states: Minimal icons (32px max), centered layout
-- **Interactions**: Subtle hover states, no gratuitous animation
-
-#### New Files
-- `static/src/css/portal_documents.css` - Custom design system with CSS variables
+#### Changes
+- **Directory Form View**: Stat buttons now use `oi-doc` and `oi-folder` icons
+- **Directory Kanban View**: Action buttons updated with `oi oi-doc` and `oi oi-folder` icons
+- **Portal Templates**: Reverted to previous clearer design (Bootstrap cards)
 
 #### Modified Files
-- `views/portal_templates.xml` - Completely redesigned with custom CSS classes
-- `__manifest__.py` - Added `web.assets_frontend` for portal CSS, version 0.3.1
-
-#### Responsive Behavior
-- Desktop (>1024px): 3-column directory grid
-- Tablet (768-1024px): 2-column grid
-- Mobile (<768px): Single column, stacked metadata
+- `views/document_directory_views.xml` - Updated icons to OI
+- `views/portal_templates.xml` - Reverted to 0.3.0 design
+- `__manifest__.py` - Removed unused web.assets_frontend, version 0.3.2
 
 ---
 
