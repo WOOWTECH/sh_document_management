@@ -42,6 +42,15 @@ class Directory(models.Model):
     sh_user_ids = fields.Many2many(
         'res.users', relation='rel_directory_user', string='Users')
 
+    # Portal User Sharing - allows external partners to access via Portal
+    portal_user_ids = fields.Many2many(
+        'res.partner',
+        relation='rel_directory_portal_user',
+        string='Portal Users',
+        domain="[('is_company', '=', False)]",
+        help="Portal users who can access this directory and its contents in the Portal"
+    )
+
     sh_share_url = fields.Char(
         string="Link", compute='_compute_full_url')
 

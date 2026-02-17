@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-02-17
+
+### Portal User Document Sharing
+
+This release adds Portal user support, allowing external partners to access shared documents via the website portal.
+
+#### New Features
+- **Portal User Sharing**: New `portal_user_ids` field on directories and attachments
+  - Share documents with external contacts (customers, partners)
+  - Portal users can access shared content at `/my/documents`
+- **Portal Pages**: Full-featured document portal
+  - `/my/documents` - Main page showing shared directories and files
+  - `/my/documents/directory/<id>` - Browse directory contents
+  - File preview (PDF, images, text) and download
+  - Directory ZIP download
+- **Permission Inheritance**: Like Odoo Projects/Tasks architecture
+  - Directory permissions automatically apply to all files and sub-directories
+  - Files can also have direct portal user assignments
+
+#### New Files
+- `controllers/portal.py` - Portal controller with access control
+- `views/portal_templates.xml` - Portal page templates
+
+#### Modified Files
+- `models/document_directory.py` - Added `portal_user_ids` field
+- `models/ir_attachment.py` - Added `portal_user_ids` field
+- `views/document_directory_views.xml` - Added Portal Users field to form
+- `views/ir_attachment_views.xml` - Added Portal Users field to form
+- `security/sh_document_management_groups.xml` - Added Portal access rules
+- `__manifest__.py` - Added `portal` dependency, version 0.3.0
+
+---
+
 ## [0.2.0] - 2026-02-17
 
 ### Code Review Fixes

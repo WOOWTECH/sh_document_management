@@ -19,6 +19,15 @@ class Attachment(models.Model):
     sh_user_ids = fields.Many2many(
         'res.users', relation='rel_attachment_user', string='Users')
 
+    # Portal User Sharing - allows external partners to access via Portal
+    portal_user_ids = fields.Many2many(
+        'res.partner',
+        relation='rel_attachment_portal_user',
+        string='Portal Users',
+        domain="[('is_company', '=', False)]",
+        help="Portal users who can directly access this file in the Portal"
+    )
+
     sh_share_url = fields.Char(
         string="Link", compute='_compute_full_url')
 

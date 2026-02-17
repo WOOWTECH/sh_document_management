@@ -2,3 +2,4 @@
 # Part of Softhealer Technologies.
 
 from . import sh_download_directories
+from . import portal

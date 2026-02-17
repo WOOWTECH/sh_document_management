@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal Home Counter -->
+    <template id="portal_my_home_document" name="Show Documents" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/sh_document_management/static/description/icon.png'"/>
+                <t t-set="title">Documents</t>
+                <t t-set="url" t-value="'/my/documents'"/>
+                <t t-set="text">View shared documents</t>
+                <t t-set="placeholder_count" t-value="'document_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Main Documents Page -->
+    <template id="portal_my_documents" name="My Documents">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Documents</t>
+            </t>
+
+            <div class="o_portal_my_documents">
+                <!-- Directories Section -->
+                <div class="mb-4">
+                    <h4 class="mb-3">
+                        <i class="fa fa-folder-open me-2"></i>
+                        My Directories
+                        <span class="badge bg-secondary ms-2" t-esc="len(directories)"/>
+                    </h4>
+
+                    <t t-if="directories">
+                        <div class="row">
+                            <t t-foreach="directories" t-as="directory">
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fa fa-folder fa-2x text-warning me-3"></i>
+                                                <div>
+                                                    <h5 class="card-title mb-0">
+                                                        <t t-esc="directory.name"/>
+                                                    </h5>
+                                                    <small class="text-muted">
+                                                        <t t-esc="directory.file_count"/> files
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3">
+                                                <a t-attf-href="/my/documents/directory/#{directory.id}"
+                                                   class="btn btn-primary btn-sm me-2">
+                                                    <i class="fa fa-folder-open me-1"></i> Open
+                                                </a>
+                                                <a t-attf-href="/my/documents/directory/#{directory.id}/download"
+                                                   class="btn btn-outline-secondary btn-sm">
+                                                    <i class="fa fa-download me-1"></i> Download ZIP
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="alert alert-light text-center py-4">
+                            <i class="fa fa-folder-open-o fa-2x text-muted mb-2 d-block"></i>
+                            <span class="text-muted">No directories shared with you</span>
+                        </div>
+                    </t>
+                </div>
+
+                <hr class="my-4"/>
+
+                <!-- Files Section -->
+                <div class="mb-4">
+                    <h4 class="mb-3">
+                        <i class="fa fa-file me-2"></i>
+                        My Files
+                        <span class="badge bg-secondary ms-2" t-esc="len(files)"/>
+                    </h4>
+
+                    <t t-if="files">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="files" t-as="file">
+                                        <tr>
+                                            <td>
+                                                <t t-call="sh_document_management.file_icon">
+                                                    <t t-set="mimetype" t-value="file.mimetype"/>
+                                                </t>
+                                                <span class="ms-2" t-esc="file.name"/>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark" t-esc="file.mimetype"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="file.create_date" t-options="{'widget': 'date'}"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-call="sh_document_management.file_actions">
+                                                    <t t-set="file" t-value="file"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="alert alert-light text-center py-4">
+                            <i class="fa fa-file-o fa-2x text-muted mb-2 d-block"></i>
+                            <span class="text-muted">No files directly shared with you</span>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Empty state when nothing shared -->
+            <t t-if="not directories and not files">
+                <div class="text-center py-5">
+                    <i class="fa fa-folder-open-o fa-4x text-muted mb-3 d-block"></i>
+                    <h4 class="text-muted">No documents shared with you yet</h4>
+                    <p class="text-muted">When someone shares documents with you, they will appear here.</p>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Directory Content Page -->
+    <template id="portal_directory_content" name="Directory Content">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/my/documents">
+                            <i class="fa fa-home"></i> My Documents
+                        </a>
+                    </li>
+                    <t t-foreach="breadcrumb" t-as="bc">
+                        <li t-attf-class="breadcrumb-item #{'active' if bc.id == directory.id else ''}">
+                            <t t-if="bc.id == directory.id">
+                                <t t-esc="bc.name"/>
+                            </t>
+                            <t t-else="">
+                                <a t-attf-href="/my/documents/directory/#{bc.id}">
+                                    <t t-esc="bc.name"/>
+                                </a>
+                            </t>
+                        </li>
+                    </t>
+                </ol>
+            </nav>
+
+            <!-- Directory Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>
+                    <i class="fa fa-folder-open text-warning me-2"></i>
+                    <t t-esc="directory.name"/>
+                </h3>
+                <a t-attf-href="/my/documents/directory/#{directory.id}/download"
+                   class="btn btn-outline-primary">
+                    <i class="fa fa-download me-1"></i> Download All as ZIP
+                </a>
+            </div>
+
+            <!-- Sub-directories -->
+            <t t-if="sub_directories">
+                <div class="mb-4">
+                    <h5 class="mb-3">
+                        <i class="fa fa-folder me-2"></i>
+                        Sub-directories
+                        <span class="badge bg-secondary ms-2" t-esc="len(sub_directories)"/>
+                    </h5>
+                    <div class="row">
+                        <t t-foreach="sub_directories" t-as="subdir">
+                            <div class="col-md-4 col-sm-6 mb-3">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-folder fa-2x text-warning me-3"></i>
+                                            <div>
+                                                <h6 class="card-title mb-0">
+                                                    <a t-attf-href="/my/documents/directory/#{subdir.id}"
+                                                       class="text-decoration-none">
+                                                        <t t-esc="subdir.name"/>
+                                                    </a>
+                                                </h6>
+                                                <small class="text-muted">
+                                                    <t t-esc="subdir.file_count"/> files
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Files in directory -->
+            <div class="mb-4">
+                <h5 class="mb-3">
+                    <i class="fa fa-file me-2"></i>
+                    Files
+                    <span class="badge bg-secondary ms-2" t-esc="len(files)"/>
+                </h5>
+
+                <t t-if="files">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th>Date</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="files" t-as="file">
+                                    <tr>
+                                        <td>
+                                            <t t-call="sh_document_management.file_icon">
+                                                <t t-set="mimetype" t-value="file.mimetype"/>
+                                            </t>
+                                            <span class="ms-2" t-esc="file.name"/>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark" t-esc="file.mimetype"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="round(file.file_size / 1024, 1)"/> KB
+                                        </td>
+                                        <td>
+                                            <span t-field="file.create_date" t-options="{'widget': 'date'}"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-call="sh_document_management.file_actions">
+                                                <t t-set="file" t-value="file"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="alert alert-light text-center py-4">
+                        <i class="fa fa-file-o fa-2x text-muted mb-2 d-block"></i>
+                        <span class="text-muted">This directory is empty</span>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- File Icon Helper Template -->
+    <template id="file_icon" name="File Icon">
+        <t t-if="mimetype and 'pdf' in mimetype">
+            <i class="fa fa-file-pdf-o text-danger"></i>
+        </t>
+        <t t-elif="mimetype and 'image' in mimetype">
+            <i class="fa fa-file-image-o text-info"></i>
+        </t>
+        <t t-elif="mimetype and ('word' in mimetype or 'document' in mimetype)">
+            <i class="fa fa-file-word-o text-primary"></i>
+        </t>
+        <t t-elif="mimetype and ('excel' in mimetype or 'spreadsheet' in mimetype)">
+            <i class="fa fa-file-excel-o text-success"></i>
+        </t>
+        <t t-elif="mimetype and ('powerpoint' in mimetype or 'presentation' in mimetype)">
+            <i class="fa fa-file-powerpoint-o text-warning"></i>
+        </t>
+        <t t-elif="mimetype and 'text' in mimetype">
+            <i class="fa fa-file-text-o text-secondary"></i>
+        </t>
+        <t t-elif="mimetype and 'zip' in mimetype">
+            <i class="fa fa-file-archive-o text-warning"></i>
+        </t>
+        <t t-else="">
+            <i class="fa fa-file-o text-muted"></i>
+        </t>
+    </template>
+
+    <!-- File Actions Helper Template -->
+    <template id="file_actions" name="File Actions">
+        <div class="btn-group btn-group-sm">
+            <!-- Preview button for supported formats -->
+            <t t-set="previewable" t-value="file.mimetype and ('pdf' in file.mimetype or 'image' in file.mimetype or 'text/plain' in file.mimetype)"/>
+            <t t-if="previewable">
+                <a t-attf-href="/my/documents/file/#{file.id}/preview"
+                   class="btn btn-outline-primary" target="_blank" title="Preview">
+                    <i class="fa fa-eye"></i>
+                </a>
+            </t>
+            <!-- Download button -->
+            <a t-attf-href="/my/documents/file/#{file.id}/download"
+               class="btn btn-outline-secondary" title="Download">
+                <i class="fa fa-download"></i>
+            </a>
+        </div>
+    </template>
+
+</odoo>
