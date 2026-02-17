@@ -18,7 +18,7 @@
                 <div class="row">
                     <div class="col-11" />
                     <div class="col-1">
-                        <button type="object" name="action_share_directory" class="btn btn-primary sh_share_btn" icon="fa-share-alt" title="Share" />
+                        <button type="object" name="action_share_directory" class="btn btn-primary sh_share_btn" title="Share" string="Share" />
                     </div>
                 </div>
             </xpath>

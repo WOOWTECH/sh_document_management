@@ -146,13 +146,12 @@
                                 </strong>
                                 <div>
                                     <button type="object" name="action_view_files"
-                                        class="btn btn-primary me-2">
-                                        <field name="files" widget="statinfo" string="Files" />
+                                        class="btn btn-primary btn-sm me-2">
+                                        <field name="files"/> Files
                                     </button>
                                     <button type="object" name="action_view_sub_directory"
-                                        class="btn btn-primary ms-2">
-                                        <field name="sub_directories" widget="statinfo"
-                                            string="Sub Directories" />
+                                        class="btn btn-primary btn-sm ms-2">
+                                        <field name="sub_directories"/> Sub Dirs
                                     </button>
                                 </div>
                             </div>
