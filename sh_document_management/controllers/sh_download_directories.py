@@ -13,17 +13,33 @@ class ShDocumentCustomerPortal(http.Controller):
 
     @http.route(['/attachment/download_directories', '/attachment/download_directiries'], type='http', auth='public', website=False, csrf=False)
     def sh_download_directories(self, list_ids='', access_token='', name='', **post):
-        """Controller to download share document from click on the click to download button from the email"""
+        """Controller to download share document from click on the click to download button from the email.
+
+        Args:
+            list_ids: ID of the directory or document to download
+            access_token: UUID token for authentication
+            name: Type of download ('directory' or 'document')
+
+        Returns:
+            HTTP response with ZIP file or 404 if not found/unauthorized
+        """
         if not list_ids or not access_token:
+            return request.not_found()
+
+        # CRITICAL-002 FIX: Validate list_ids is a valid integer
+        try:
+            record_id = int(list_ids)
+        except (ValueError, TypeError):
+            logger.warning("Invalid list_ids parameter: %s", list_ids)
             return request.not_found()
 
         # Validate access token based on type
         if name == 'directory':
-            record = request.env['document.directory'].sudo().browse(int(list_ids))
+            record = request.env['document.directory'].sudo().browse(record_id)
             if not record.exists() or record.sh_access_token != access_token:
                 return request.not_found()
         elif name == 'document':
-            record = request.env['ir.attachment'].sudo().browse(int(list_ids))
+            record = request.env['ir.attachment'].sudo().browse(record_id)
             if not record.exists() or record.access_token != access_token:
                 return request.not_found()
         else:

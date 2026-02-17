@@ -5,9 +5,6 @@ import random
 import base64
 import zipfile
 import io
-import tempfile
-import shutil
-import os
 import uuid
 from odoo import models, fields, api, _
 
@@ -25,9 +22,8 @@ class Directory(models.Model):
         help="Small-sized image of the product. It is automatically "
              "resized as a 64x64px image, with aspect ratio preserved. "
              "Use this field anywhere a small image is required.")
-    file_count = fields.Integer(compute='_compute_file_counts')
-    sub_directory_count = fields.Integer(
-        compute='_compute_sub_directory_count')
+    file_count = fields.Integer(compute='_compute_counts', string="File Count")
+    sub_directory_count = fields.Integer(compute='_compute_counts', string="Sub Directory Count")
     parent_id = fields.Many2one('document.directory', 'Parent Directory')
     visible_directory = fields.Boolean(string='Visible Directory')
     directory_tag_ids = fields.Many2many(
@@ -35,10 +31,10 @@ class Directory(models.Model):
     attachment_ids = fields.One2many(
         'ir.attachment', 'directory_id', string=" Files")
     directory_ids = fields.Many2many(
-        'document.directory', compute='_compute_sub_directory_count')
-    files = fields.Integer(string="Files", compute='_compute_file_counts_btn')
-    sub_directories = fields.Integer(
-        string="Sub Directories", compute='_compute_sub_directory_count_btn')
+        'document.directory', compute='_compute_counts')
+    # HIGH-002 FIX: Consolidated duplicate fields - use file_count and sub_directory_count directly
+    files = fields.Integer(string="Files", related='file_count')
+    sub_directories = fields.Integer(string="Sub Directories", related='sub_directory_count')
     color = fields.Integer(string='Color Index')
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.company)
@@ -80,13 +76,16 @@ class Directory(models.Model):
             return sh_access_token
 
     def _compute_full_url(self):
+        """Compute the public share URL for each directory.
+
+        MEDIUM-003 FIX: Handle multiple records properly by iterating over self.
+        """
         IrConfig = self.env['ir.config_parameter'].sudo()
         # Use auto-detected public URL, fall back to web.base.url (BUG-002 fix)
         base_url = IrConfig.get_param('sh_document_management.public_base_url') or \
                    IrConfig.get_param('web.base.url')
-        self.sh_share_url = base_url + '/attachment/download_directories' + \
-            '?list_ids=%s&access_token=%s&name=%s' % (
-                self.id, self._get_token(), 'directory')
+        for record in self:
+            record.sh_share_url = f"{base_url}/attachment/download_directories?list_ids={record.id}&access_token={record._get_token()}&name=directory"
 
     def action_share_directory(self):
         self._compute_full_url()
@@ -131,59 +130,51 @@ class Directory(models.Model):
             attachment_ids.sudo().unlink()
 
     def action_download_as_zip(self):
-        if self.env.context.get('active_ids'):
-            directory_ids = self.env['document.directory'].sudo().browse(
-                self.env.context.get('active_ids'))
-            if directory_ids:
-                mem_zip = io.BytesIO()
-                tmp_dir = tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
-                path = tmp_dir
-                path_main = tempfile.gettempdir()
-                is_exist = os.path.exists(path_main)
-                if not is_exist:
-                    os.mkdir(path_main)
-                path_ED = path_main
-                # path_ID = tmp_dir
-                with zipfile.ZipFile(mem_zip,
-                                     mode="w",
-                                     compression=zipfile.ZIP_DEFLATED) as zf:
-                    for directory in directory_ids:
-                        path = os.path.join(path_ED, directory.name)
-                        is_exist = os.path.exists(path)
-                        if not is_exist:
-                            os.mkdir(path)
-                        documents = self.env['ir.attachment'].sudo().search(
-                            [('directory_id', '=', directory.id)])
-                        if documents:
-                            for attachment in documents:
-                                # if bill then only export attachment.
-                                attachment_name = attachment.name.replace(
-                                    '/', '_') if attachment.name else 'attachment'
-                                f = open(path + "/" + attachment_name,
-                                         "wb")  # create
-                                content_base64 = base64.b64decode(
-                                    attachment.datas)
-                                f.write(content_base64)
-                                f.close()
-                                zf.write(path + "/" + attachment_name)
+        """Export selected directories as a ZIP file.
 
-                content = base64.encodebytes(mem_zip.getvalue())
-                if content:
-                    get_attachment = self.env['ir.attachment'].sudo().create({
-                        'name': 'Documents.zip',
-                        'sh_document_as_zip': True,
-                        'type': 'binary',
-                        'mimetype': 'application/zip',
-                        'datas': content
-                    })
-                shutil.rmtree(tmp_dir)
-                url = "/web/content/" + \
-                    str(get_attachment.id) + "?download=true"
-                return {
-                    'type': 'ir.actions.act_url',
-                    'url': url,
-                    'target': 'current',
-                }
+        HIGH-003 FIX: Use writestr() instead of writing to disk.
+        HIGH-005 FIX: Removed unsafe file handle usage.
+        """
+        if not self.env.context.get('active_ids'):
+            return
+
+        directory_ids = self.env['document.directory'].sudo().browse(
+            self.env.context.get('active_ids'))
+        if not directory_ids:
+            return
+
+        mem_zip = io.BytesIO()
+        with zipfile.ZipFile(mem_zip, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+            for directory in directory_ids:
+                dir_name = directory.name or 'directory'
+                documents = self.env['ir.attachment'].sudo().search(
+                    [('directory_id', '=', directory.id)])
+                for attachment in documents:
+                    if not attachment.datas:
+                        continue
+                    # Sanitize filename to prevent path traversal
+                    attachment_name = (attachment.name or 'attachment').replace('/', '_')
+                    # Create path within ZIP: directory_name/filename
+                    zip_path = f"{dir_name}/{attachment_name}"
+                    # HIGH-003 FIX: Write directly to ZIP from memory
+                    content = base64.b64decode(attachment.datas)
+                    zf.writestr(zip_path, content)
+
+        content = base64.encodebytes(mem_zip.getvalue())
+        if content:
+            get_attachment = self.env['ir.attachment'].sudo().create({
+                'name': 'Documents.zip',
+                'sh_document_as_zip': True,
+                'type': 'binary',
+                'mimetype': 'application/zip',
+                'datas': content
+            })
+            url = f"/web/content/{get_attachment.id}?download=true"
+            return {
+                'type': 'ir.actions.act_url',
+                'url': url,
+                'target': 'current',
+            }
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -195,47 +186,53 @@ class Directory(models.Model):
             values['color'] = number
         return super(Directory, self).create(vals_list)
 
-    def _compute_file_counts(self):
-        if self:
-            for rec in self:
-                ir_attachment_ids = self.env['ir.attachment'].sudo().search(
-                    [('directory_id', '=', rec.id)])
-                if ir_attachment_ids:
-                    rec.file_count = len(ir_attachment_ids.ids)
-                else:
-                    rec.file_count = 0
+    def _compute_counts(self):
+        """Compute file count, sub-directory count, and directory_ids.
 
-    def _compute_sub_directory_count(self):
-        if self:
-            for rec in self:
-                sub_directory_ids = self.env['document.directory'].sudo().search(
-                    [('parent_id', '=', rec.id)])
-                if sub_directory_ids:
-                    rec.sub_directory_count = len(sub_directory_ids.ids)
-                    rec.directory_ids = [(6, 0, sub_directory_ids.ids)]
-                else:
-                    rec.sub_directory_count = 0
-                    rec.directory_ids = False
+        HIGH-001 FIX: Use read_group for batch counting instead of N+1 queries.
+        HIGH-002 FIX: Consolidated all count computations into single method.
+        """
+        if not self:
+            return
 
-    def _compute_file_counts_btn(self):
-        if self:
-            for rec in self:
-                ir_attachment_ids = self.env['ir.attachment'].sudo().search(
-                    [('directory_id', '=', rec.id)])
-                if ir_attachment_ids:
-                    rec.files = len(ir_attachment_ids.ids)
-                else:
-                    rec.files = 0
+        # Batch count files using read_group
+        attachment_data = self.env['ir.attachment'].sudo().read_group(
+            [('directory_id', 'in', self.ids)],
+            ['directory_id'],
+            ['directory_id']
+        )
+        file_count_map = {
+            d['directory_id'][0]: d['directory_id_count']
+            for d in attachment_data if d['directory_id']
+        }
 
-    def _compute_sub_directory_count_btn(self):
-        if self:
-            for rec in self:
-                sub_directory_ids = self.env['document.directory'].sudo().search(
-                    [('parent_id', '=', rec.id)])
-                if sub_directory_ids:
-                    rec.sub_directories = len(sub_directory_ids.ids)
-                else:
-                    rec.sub_directories = 0
+        # Batch count sub-directories using read_group
+        subdir_data = self.env['document.directory'].sudo().read_group(
+            [('parent_id', 'in', self.ids)],
+            ['parent_id'],
+            ['parent_id']
+        )
+        subdir_count_map = {
+            d['parent_id'][0]: d['parent_id_count']
+            for d in subdir_data if d['parent_id']
+        }
+
+        # Get actual sub-directory records for directory_ids field
+        all_subdirs = self.env['document.directory'].sudo().search(
+            [('parent_id', 'in', self.ids)]
+        )
+        subdir_ids_map = {}
+        for subdir in all_subdirs:
+            parent_id = subdir.parent_id.id
+            if parent_id not in subdir_ids_map:
+                subdir_ids_map[parent_id] = []
+            subdir_ids_map[parent_id].append(subdir.id)
+
+        # Assign values to each record
+        for rec in self:
+            rec.file_count = file_count_map.get(rec.id, 0)
+            rec.sub_directory_count = subdir_count_map.get(rec.id, 0)
+            rec.directory_ids = [(6, 0, subdir_ids_map.get(rec.id, []))]
 
     def action_view_sub_directory(self):
         if self:

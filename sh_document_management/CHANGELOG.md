@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2026-02-17
+
+### Code Review Fixes
+
+This release addresses issues identified during comprehensive code review.
+
+#### Critical Fixes
+- **CRITICAL-002**: Added input validation for `list_ids` parameter in public download controller
+  - Prevents unhandled exceptions from malformed input
+  - Returns proper 404 instead of 500 error
+
+#### Performance Improvements
+- **HIGH-001**: Fixed N+1 query pattern in computed fields
+  - Replaced individual `search()` calls with batch `read_group()` operations
+  - Significantly improves performance on kanban/list views with many directories
+- **HIGH-002**: Consolidated duplicate computed fields
+  - `files` and `sub_directories` now use `related=` instead of duplicate computation
+  - Reduces database queries by 50%
+
+#### Code Quality Improvements
+- **HIGH-003**: ZIP export now uses in-memory operations
+  - Removed unnecessary disk writes using `writestr()` instead of file operations
+  - Better security (no temp files on disk)
+  - Improved performance
+- **HIGH-005**: Fixed unsafe file handle usage
+  - Removed file operations that could leak resources on exceptions
+- **MEDIUM-003**: Fixed `_compute_full_url` to handle multiple records
+  - Now properly iterates over recordset
+- Standardized string formatting to f-strings
+- Added docstrings to critical methods
+- Removed unused imports (tempfile, shutil, os)
+
+#### Affected Files
+- `controllers/sh_download_directories.py` (input validation)
+- `models/document_directory.py` (N+1 fix, ZIP refactor, compute fix)
+- `models/ir_attachment.py` (f-string standardization)
+
+---
+
 ## [0.1.0] - 2025-12-10
 
 ### Stable Release

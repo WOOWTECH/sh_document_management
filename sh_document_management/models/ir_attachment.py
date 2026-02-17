@@ -23,6 +23,7 @@ class Attachment(models.Model):
         string="Link", compute='_compute_full_url')
 
     def _compute_full_url(self):
+        """Compute the public share URL for each attachment."""
         IrConfig = self.env['ir.config_parameter'].sudo()
         # Use auto-detected public URL, fall back to web.base.url (BUG-002 fix)
         base_url = IrConfig.get_param('sh_document_management.public_base_url') or \
@@ -31,9 +32,7 @@ class Attachment(models.Model):
             # Generate access token if not exists (Odoo base method)
             if not record.access_token:
                 record.generate_access_token()
-            record.sh_share_url = base_url + '/attachment/download_directories' + \
-                '?list_ids=%s&access_token=%s&name=%s' % (
-                    record.id, record.access_token, 'document')
+            record.sh_share_url = f"{base_url}/attachment/download_directories?list_ids={record.id}&access_token={record.access_token}&name=document"
 
     def action_share_directory(self):
         self._compute_full_url()
