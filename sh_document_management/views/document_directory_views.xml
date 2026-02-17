@@ -133,27 +133,13 @@
                 <field name="directory_tag_ids" />
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="o_kanban_image">
-                                <img
-                                    t-att-src="kanban_image('document.directory', 'image_medium', record.id.raw_value)"
-                                    alt="Directory" />
-                            </div>
-                            <div class="oe_kanban_details">
-                                <strong class="o_kanban_record_title">
-                                    <field name="name" />
-                                    <small t-if="record.name.value"></small>
-                                </strong>
-                                <div>
-                                    <button type="object" name="action_view_files"
-                                        class="btn btn-primary btn-sm me-2">
-                                        <field name="files"/> Files
-                                    </button>
-                                    <button type="object" name="action_view_sub_directory"
-                                        class="btn btn-primary btn-sm ms-2">
-                                        <field name="sub_directories"/> Sub Dirs
-                                    </button>
-                                </div>
+                        <div class="oe_kanban_global_click p-2">
+                            <strong class="o_kanban_record_title">
+                                <field name="name" />
+                            </strong>
+                            <div class="text-muted small">
+                                <span><t t-esc="record.files.value"/> Files</span>
+                                <span class="ms-2"><t t-esc="record.sub_directories.value"/> Sub Dirs</span>
                             </div>
                         </div>
                     </t>
