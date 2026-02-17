@@ -43,37 +43,18 @@
                         <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
                     </t>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_area oe_kanban_global_click o_kanban_attachment">
-                            <div class="o_kanban_image">
-                                <t t-set="binaryPreviewable"
-                                   t-value="new RegExp('(image|video|application/pdf|text)').test(record.mimetype.value) &amp;&amp; record.type.raw_value === 'binary'"/>
-                                <div t-attf-class="o_kanban_image_wrapper #{(webimage or binaryPreviewable) ? 'o_kanban_previewer' : ''}">
-                                    <t t-set="webimage" t-value="new RegExp('image.*(gif|jpeg|jpg|png|webp)').test(record.mimetype.value)"/>
-                                    <div t-if="record.type.raw_value == 'url'" class="o_url_image fa fa-link fa-3x text-muted" aria-label="Image is a link"/>
-                                    <img t-elif="webimage" t-attf-src="/web/image/#{record.id.raw_value}" width="100" height="100" alt="Document" class="o_attachment_image"/>
-                                    <div t-else="" class="o_image o_image_thumbnail" t-att-data-mimetype="record.mimetype.value"/>
+                        <div class="oe_kanban_global_click o_kanban_record d-flex flex-column p-2">
+                            <div class="d-flex align-items-start">
+                                <div class="o_image o_image_thumbnail me-2" t-att-data-mimetype="record.mimetype.value" style="width:24px;height:24px;min-width:24px;"/>
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <div t-att-title="record.name.raw_value" class="o_kanban_record_title text-truncate fw-bold">
+                                        <field name="name"/>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="o_kanban_details">
-                                <div class="o_kanban_details_wrapper">
-                                    <div t-att-title="record.name.raw_value" class="o_kanban_record_title">
-                                        <field name="name" class="o_text_overflow"/>
-                                    </div>
-                                    <div class="o_kanban_record_body">
-                                        <t t-if="record.type.raw_value == 'url'">
-                                            <span class="o_document_url"><i class="fa fa-globe" aria-label="Document url"/> <field name="url" widget="url"/></span>
-                                        </t>
-                                        <samp t-else="" class="text-muted"> </samp>
-                                    </div>
-                                    <div class="o_kanban_record_bottom">
-                                        <time class="oe_kanban_bottom_left">
-                                            <field name="create_date" widget="date"/>
-                                        </time>
-                                        <div class="oe_kanban_bottom_right">
-                                            <field name="create_uid" widget="many2one_avatar_user"/>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2 text-muted small">
+                                <span><field name="create_date" widget="date"/></span>
+                                <field name="create_uid" widget="many2one_avatar_user"/>
                             </div>
                         </div>
                     </t>
