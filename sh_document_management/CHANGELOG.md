@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.3] - 2026-02-17
+
+### MDI Icon Update
+
+Updated backend Document views to use Material Design Icons (MDI) for better visual consistency and modern appearance.
+
+#### Icon Changes
+- **Files button**: `mdi-file-document-multiple` (multiple document icon)
+- **Sub Directories button**: `mdi-folder-multiple` (multiple folder icon)
+- **Share button**: `mdi-share-variant` (share icon)
+
+#### Modified Files
+- `views/document_directory_views.xml` - Updated all icons to MDI
+- `__manifest__.py` - Version 0.3.3
+
+---
+
 ## [0.3.2] - 2026-02-17
 
 ### UI Icon Update

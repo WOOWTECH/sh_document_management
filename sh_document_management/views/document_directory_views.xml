@@ -8,11 +8,11 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button type="object" name="action_view_files" class="oe_stat_button"
-                            icon="oi-doc" title="Files">
+                            icon="mdi-file-document-multiple" title="Files">
                             <field name="files" widget="statinfo" string="Files" />
                         </button>
                         <button type="object" name="action_view_sub_directory"
-                            class="oe_stat_button" icon="oi-folder">
+                            class="oe_stat_button" icon="mdi-folder-multiple">
                             <field name="sub_directories" widget="statinfo" string="Sub Directories" />
                         </button>
                     </div>
@@ -51,7 +51,7 @@
                         <div class="col-11" />
                         <div class="col-1">
                             <button type="object" name="action_share_directory"
-                                class="btn btn-primary sh_share_btn" icon="fa-share-alt"
+                                class="btn btn-primary sh_share_btn" icon="mdi-share-variant"
                                 title="Share" />
                         </div>
                     </div>
@@ -147,12 +147,12 @@
                                 <div>
                                     <button type="object" name="action_view_files"
                                         class="btn btn-primary me-2">
-                                        <i class="oi oi-doc me-1" title="Files" />
+                                        <i class="mdi mdi-file-document-multiple me-1" title="Files" />
                                         <field name="files" widget="statinfo" string="Files" />
                                     </button>
                                     <button type="object" name="action_view_sub_directory"
                                         class="btn btn-primary ms-2">
-                                        <i class="oi oi-folder me-1" title="Sub Directories" />
+                                        <i class="mdi mdi-folder-multiple me-1" title="Sub Directories" />
                                         <field name="sub_directories" widget="statinfo"
                                             string="Sub Directories" />
                                     </button>
