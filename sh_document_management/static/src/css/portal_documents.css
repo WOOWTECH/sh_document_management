@@ -1,0 +1,442 @@
+/**
+ * Portal Documents - Minimal & Clean Design
+ * Inspired by Notion, Linear, and Dropbox Paper
+ * Version: 0.3.1
+ */
+
+/* ===== Design Tokens ===== */
+:root {
+    /* Typography */
+    --doc-font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* Neutrals - Cool gray scale */
+    --doc-color-bg: #FAFAFA;
+    --doc-color-surface: #FFFFFF;
+    --doc-color-border: #E5E5E5;
+    --doc-color-border-subtle: #F0F0F0;
+
+    /* Text */
+    --doc-color-text-primary: #1A1A1A;
+    --doc-color-text-secondary: #6B6B6B;
+    --doc-color-text-tertiary: #9B9B9B;
+
+    /* Accent - Subtle blue */
+    --doc-color-accent: #2563EB;
+    --doc-color-accent-hover: #1D4ED8;
+    --doc-color-accent-subtle: #EFF6FF;
+
+    /* States */
+    --doc-color-hover: #F5F5F5;
+    --doc-color-active: #EBEBEB;
+
+    /* Spacing - 4px base unit */
+    --doc-space-1: 4px;
+    --doc-space-2: 8px;
+    --doc-space-3: 12px;
+    --doc-space-4: 16px;
+    --doc-space-5: 20px;
+    --doc-space-6: 24px;
+    --doc-space-8: 32px;
+    --doc-space-10: 40px;
+    --doc-space-12: 48px;
+
+    /* File type colors */
+    --doc-color-pdf: #DC2626;
+    --doc-color-image: #2563EB;
+    --doc-color-word: #2563EB;
+    --doc-color-excel: #16A34A;
+    --doc-color-ppt: #EA580C;
+    --doc-color-text: #6B7280;
+    --doc-color-archive: #CA8A04;
+    --doc-color-default: #9CA3AF;
+}
+
+/* ===== Base Container ===== */
+.doc-portal {
+    font-family: var(--doc-font-primary);
+    color: var(--doc-color-text-primary);
+    background: var(--doc-color-bg);
+    min-height: 100vh;
+}
+
+.doc-portal-content {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--doc-space-8);
+}
+
+/* ===== Page Header ===== */
+.doc-header {
+    padding: var(--doc-space-8) 0;
+    border-bottom: 1px solid var(--doc-color-border-subtle);
+    margin-bottom: var(--doc-space-8);
+}
+
+.doc-header-title {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--doc-color-text-primary);
+    margin: 0 0 var(--doc-space-2) 0;
+}
+
+.doc-header-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--doc-color-text-secondary);
+    margin: 0;
+}
+
+/* ===== Section Header ===== */
+.doc-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--doc-space-4);
+}
+
+.doc-section-label {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--doc-color-text-tertiary);
+}
+
+.doc-section-count {
+    font-size: 12px;
+    color: var(--doc-color-text-tertiary);
+}
+
+/* ===== Directory Cards ===== */
+.doc-directories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--doc-space-4);
+    margin-bottom: var(--doc-space-8);
+}
+
+@media (max-width: 1024px) {
+    .doc-directories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .doc-directories-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.doc-directory-card {
+    background: var(--doc-color-surface);
+    border: 1px solid var(--doc-color-border);
+    border-radius: 8px;
+    padding: var(--doc-space-4);
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.doc-directory-card:hover {
+    background: var(--doc-color-hover);
+    border-color: var(--doc-color-border);
+    text-decoration: none;
+}
+
+.doc-directory-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--doc-space-3);
+}
+
+.doc-directory-icon {
+    font-size: 16px;
+    color: #F59E0B;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.doc-directory-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.doc-directory-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--doc-color-text-primary);
+    margin: 0 0 var(--doc-space-1) 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.doc-directory-meta {
+    font-size: 13px;
+    color: var(--doc-color-text-tertiary);
+}
+
+/* ===== File List ===== */
+.doc-files-list {
+    background: var(--doc-color-surface);
+    border: 1px solid var(--doc-color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: var(--doc-space-8);
+}
+
+.doc-file-row {
+    display: flex;
+    align-items: center;
+    padding: var(--doc-space-3) var(--doc-space-4);
+    border-bottom: 1px solid var(--doc-color-border-subtle);
+    transition: background-color 0.15s ease;
+}
+
+.doc-file-row:last-child {
+    border-bottom: none;
+}
+
+.doc-file-row:hover {
+    background: var(--doc-color-hover);
+}
+
+.doc-file-row:hover .doc-file-actions {
+    opacity: 1;
+}
+
+.doc-file-icon {
+    font-size: 16px;
+    width: 20px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.doc-file-icon.pdf { color: var(--doc-color-pdf); }
+.doc-file-icon.image { color: var(--doc-color-image); }
+.doc-file-icon.word { color: var(--doc-color-word); }
+.doc-file-icon.excel { color: var(--doc-color-excel); }
+.doc-file-icon.ppt { color: var(--doc-color-ppt); }
+.doc-file-icon.text { color: var(--doc-color-text); }
+.doc-file-icon.archive { color: var(--doc-color-archive); }
+.doc-file-icon.default { color: var(--doc-color-default); }
+
+.doc-file-info {
+    flex: 1;
+    min-width: 0;
+    margin-left: var(--doc-space-3);
+}
+
+.doc-file-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--doc-color-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.doc-file-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--doc-space-4);
+    margin-left: auto;
+    padding-left: var(--doc-space-4);
+    flex-shrink: 0;
+}
+
+.doc-file-meta-item {
+    font-size: 13px;
+    color: var(--doc-color-text-tertiary);
+    white-space: nowrap;
+}
+
+.doc-file-actions {
+    display: flex;
+    gap: var(--doc-space-1);
+    margin-left: var(--doc-space-4);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+@media (max-width: 768px) {
+    .doc-file-actions {
+        opacity: 1;
+    }
+
+    .doc-file-meta {
+        display: none;
+    }
+}
+
+/* ===== Buttons ===== */
+.doc-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--doc-space-2);
+    background: var(--doc-color-accent);
+    color: white;
+    padding: var(--doc-space-2) var(--doc-space-4);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.doc-btn-primary:hover {
+    background: var(--doc-color-accent-hover);
+    color: white;
+    text-decoration: none;
+}
+
+.doc-btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--doc-color-text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.doc-btn-icon:hover {
+    background: var(--doc-color-hover);
+    color: var(--doc-color-text-primary);
+    text-decoration: none;
+}
+
+.doc-btn-icon i {
+    font-size: 14px;
+}
+
+/* ===== Breadcrumb ===== */
+.doc-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--doc-space-2);
+    font-size: 13px;
+    margin-bottom: var(--doc-space-6);
+}
+
+.doc-breadcrumb-item {
+    color: var(--doc-color-text-secondary);
+    text-decoration: none;
+}
+
+.doc-breadcrumb-item:hover {
+    text-decoration: underline;
+    color: var(--doc-color-text-secondary);
+}
+
+.doc-breadcrumb-item.current {
+    color: var(--doc-color-text-primary);
+}
+
+.doc-breadcrumb-separator {
+    color: var(--doc-color-text-tertiary);
+}
+
+/* ===== Directory Header (detail page) ===== */
+.doc-directory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--doc-space-6) 0;
+    border-bottom: 1px solid var(--doc-color-border-subtle);
+    margin-bottom: var(--doc-space-8);
+}
+
+.doc-directory-title {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--doc-color-text-primary);
+    margin: 0;
+}
+
+/* ===== Empty States ===== */
+.doc-empty-state {
+    text-align: center;
+    padding: var(--doc-space-12) var(--doc-space-8);
+}
+
+.doc-empty-state-icon {
+    font-size: 32px;
+    color: var(--doc-color-text-tertiary);
+    margin-bottom: var(--doc-space-4);
+}
+
+.doc-empty-state-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--doc-color-text-primary);
+    margin: 0 0 var(--doc-space-2) 0;
+}
+
+.doc-empty-state-text {
+    font-size: 14px;
+    color: var(--doc-color-text-secondary);
+    margin: 0;
+}
+
+.doc-empty-inline {
+    font-size: 14px;
+    color: var(--doc-color-text-tertiary);
+    padding: var(--doc-space-4);
+}
+
+/* ===== File Table Header ===== */
+.doc-files-header {
+    display: flex;
+    align-items: center;
+    padding: var(--doc-space-3) var(--doc-space-4);
+    border-bottom: 1px solid var(--doc-color-border);
+    background: var(--doc-color-bg);
+}
+
+.doc-files-header-name {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--doc-color-text-tertiary);
+    padding-left: 32px; /* align with file names */
+}
+
+.doc-files-header-meta {
+    display: flex;
+    gap: var(--doc-space-4);
+    padding-right: 76px; /* align with actions column */
+}
+
+.doc-files-header-meta span {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--doc-color-text-tertiary);
+    min-width: 60px;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .doc-files-header-meta {
+        display: none;
+    }
+
+    .doc-files-header-name {
+        padding-right: 0;
+    }
+}
