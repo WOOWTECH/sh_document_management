@@ -4,7 +4,6 @@
     <template id="portal_my_home_document" name="Show Documents" inherit_id="portal.portal_my_home" priority="30">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
-                <t t-set="icon" t-value="'/sh_document_management/static/description/icon.png'"/>
                 <t t-set="title">Documents</t>
                 <t t-set="url" t-value="'/my/documents'"/>
                 <t t-set="text">View shared documents</t>
@@ -35,38 +34,21 @@
                         <div class="row">
                             <t t-foreach="directories" t-as="directory">
                                 <div class="col-md-4 col-sm-6 mb-3">
-                                    <div class="card h-100 shadow-sm">
+                                    <a t-attf-href="/my/documents/directory/#{directory.id}" class="card h-100 shadow-sm text-decoration-none">
                                         <div class="card-body">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <i class="fa fa-folder fa-2x text-warning me-3"></i>
-                                                <div>
-                                                    <h5 class="card-title mb-0">
-                                                        <t t-esc="directory.name"/>
-                                                    </h5>
-                                                    <small class="text-muted">
-                                                        <t t-esc="directory.file_count"/> files
-                                                    </small>
-                                                </div>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa fa-folder text-warning me-2"></i>
+                                                <span class="fw-bold text-dark"><t t-esc="directory.name"/></span>
                                             </div>
-                                            <div class="mt-3">
-                                                <a t-attf-href="/my/documents/directory/#{directory.id}"
-                                                   class="btn btn-primary btn-sm me-2">
-                                                    <i class="fa fa-folder-open me-1"></i> Open
-                                                </a>
-                                                <a t-attf-href="/my/documents/directory/#{directory.id}/download"
-                                                   class="btn btn-outline-secondary btn-sm">
-                                                    <i class="fa fa-download me-1"></i> Download ZIP
-                                                </a>
-                                            </div>
+                                            <small class="text-muted"><t t-esc="directory.file_count"/> files</small>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             </t>
                         </div>
                     </t>
                     <t t-else="">
-                        <div class="alert alert-light text-center py-4">
-                            <i class="fa fa-folder-open-o fa-2x text-muted mb-2 d-block"></i>
+                        <div class="alert alert-light text-center py-3">
                             <span class="text-muted">No directories shared with you</span>
                         </div>
                     </t>
@@ -120,8 +102,7 @@
                         </div>
                     </t>
                     <t t-else="">
-                        <div class="alert alert-light text-center py-4">
-                            <i class="fa fa-file-o fa-2x text-muted mb-2 d-block"></i>
+                        <div class="alert alert-light text-center py-3">
                             <span class="text-muted">No files directly shared with you</span>
                         </div>
                     </t>
@@ -131,9 +112,8 @@
             <!-- Empty state when nothing shared -->
             <t t-if="not directories and not files">
                 <div class="text-center py-5">
-                    <i class="fa fa-folder-open-o fa-4x text-muted mb-3 d-block"></i>
-                    <h4 class="text-muted">No documents shared with you yet</h4>
-                    <p class="text-muted">When someone shares documents with you, they will appear here.</p>
+                    <h5 class="text-muted">No documents shared with you yet</h5>
+                    <p class="text-muted small">When someone shares documents with you, they will appear here.</p>
                 </div>
             </t>
         </t>
@@ -190,24 +170,15 @@
                     <div class="row">
                         <t t-foreach="sub_directories" t-as="subdir">
                             <div class="col-md-4 col-sm-6 mb-3">
-                                <div class="card h-100 shadow-sm">
+                                <a t-attf-href="/my/documents/directory/#{subdir.id}" class="card h-100 shadow-sm text-decoration-none">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center">
-                                            <i class="fa fa-folder fa-2x text-warning me-3"></i>
-                                            <div>
-                                                <h6 class="card-title mb-0">
-                                                    <a t-attf-href="/my/documents/directory/#{subdir.id}"
-                                                       class="text-decoration-none">
-                                                        <t t-esc="subdir.name"/>
-                                                    </a>
-                                                </h6>
-                                                <small class="text-muted">
-                                                    <t t-esc="subdir.file_count"/> files
-                                                </small>
-                                            </div>
+                                            <i class="fa fa-folder text-warning me-2"></i>
+                                            <span class="fw-bold text-dark"><t t-esc="subdir.name"/></span>
                                         </div>
+                                        <small class="text-muted"><t t-esc="subdir.file_count"/> files</small>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         </t>
                     </div>
@@ -264,8 +235,7 @@
                     </div>
                 </t>
                 <t t-else="">
-                    <div class="alert alert-light text-center py-4">
-                        <i class="fa fa-file-o fa-2x text-muted mb-2 d-block"></i>
+                    <div class="alert alert-light text-center py-3">
                         <span class="text-muted">This directory is empty</span>
                     </div>
                 </t>
