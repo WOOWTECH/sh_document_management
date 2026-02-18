@@ -3,11 +3,12 @@
 
 import base64
 import io
+import mimetypes
 import zipfile
 import logging
 
 from odoo import http, _
-from odoo.http import request, content_disposition
+from odoo.http import request, content_disposition, Response
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.exceptions import AccessError
 
@@ -209,8 +210,18 @@ class DocumentPortal(CustomerPortal):
             # Not previewable, redirect to download
             return request.redirect(f'/my/documents/file/{file_id}/download')
 
-        # For previewable files, stream the content
-        return request.redirect(f'/web/content/{attachment.id}?inline=true')
+        # Stream file content directly (works through VPN/proxy)
+        if not attachment.datas:
+            return request.not_found()
+
+        content = base64.b64decode(attachment.datas)
+        headers = [
+            ('Content-Type', attachment.mimetype or 'application/octet-stream'),
+            ('Content-Length', len(content)),
+            ('Content-Disposition', f'inline; filename="{attachment.name}"'),
+            ('X-Content-Type-Options', 'nosniff'),
+        ]
+        return request.make_response(content, headers)
 
     @http.route(['/my/documents/file/<int:file_id>/download'],
                 type='http', auth='user', website=True)
@@ -226,8 +237,18 @@ class DocumentPortal(CustomerPortal):
         except AccessError:
             return request.not_found()
 
-        # Stream the file for download
-        return request.redirect(f'/web/content/{attachment.id}?download=true')
+        # Stream file content directly (works through VPN/proxy)
+        if not attachment.datas:
+            return request.not_found()
+
+        content = base64.b64decode(attachment.datas)
+        headers = [
+            ('Content-Type', attachment.mimetype or 'application/octet-stream'),
+            ('Content-Length', len(content)),
+            ('Content-Disposition', content_disposition(attachment.name or 'download')),
+            ('X-Content-Type-Options', 'nosniff'),
+        ]
+        return request.make_response(content, headers)
 
     @http.route(['/my/documents/directory/<int:directory_id>/download'],
                 type='http', auth='user', website=True)
