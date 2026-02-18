@@ -215,12 +215,24 @@ class DocumentPortal(CustomerPortal):
             return request.not_found()
 
         content = base64.b64decode(attachment.datas)
+
+        # Sanitize filename for Content-Disposition header
+        filename = (attachment.name or 'file').replace('"', '\\"')
+
         headers = [
             ('Content-Type', attachment.mimetype or 'application/octet-stream'),
             ('Content-Length', len(content)),
-            ('Content-Disposition', f'inline; filename="{attachment.name}"'),
             ('X-Content-Type-Options', 'nosniff'),
+            ('Cache-Control', 'no-cache'),
         ]
+
+        # For PDF, use specific handling to ensure proper rendering
+        if attachment.mimetype == 'application/pdf':
+            headers.append(('Content-Disposition', f'inline; filename="{filename}"'))
+            headers.append(('Accept-Ranges', 'bytes'))
+        else:
+            headers.append(('Content-Disposition', f'inline; filename="{filename}"'))
+
         return request.make_response(content, headers)
 
     @http.route(['/my/documents/file/<int:file_id>/download'],
