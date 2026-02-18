@@ -290,4 +290,149 @@
         </div>
     </template>
 
+    <!-- PDF Viewer Page -->
+    <template id="portal_pdf_viewer" name="PDF Viewer">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+
+            <div class="container-fluid p-0">
+                <!-- Header with file info and download button -->
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <a href="/my/documents" class="btn btn-sm btn-outline-secondary me-2">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                        <i class="fa fa-file-pdf-o text-danger me-2"></i>
+                        <span class="fw-bold text-truncate" style="max-width: 200px;" t-esc="file.name"/>
+                    </div>
+                    <a t-attf-href="/my/documents/file/#{file_id}/download" class="btn btn-sm btn-primary">
+                        <i class="fa fa-download me-1"></i> Download
+                    </a>
+                </div>
+
+                <!-- PDF Viewer Container -->
+                <div id="pdf-viewer-container" style="width: 100%; height: calc(100vh - 150px); overflow: auto; background: #525659;">
+                    <canvas id="pdf-canvas" style="display: block; margin: 0 auto;"></canvas>
+                </div>
+
+                <!-- Page Navigation -->
+                <div class="d-flex justify-content-center align-items-center bg-light p-2 border-top">
+                    <button id="prev-page" class="btn btn-sm btn-outline-secondary me-2">
+                        <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <span class="mx-2">
+                        Page <span id="page-num">1</span> / <span id="page-count">1</span>
+                    </span>
+                    <button id="next-page" class="btn btn-sm btn-outline-secondary ms-2">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                    <button id="zoom-out" class="btn btn-sm btn-outline-secondary ms-3">
+                        <i class="fa fa-search-minus"></i>
+                    </button>
+                    <button id="zoom-in" class="btn btn-sm btn-outline-secondary ms-1">
+                        <i class="fa fa-search-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PDF.js from CDN -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var url = '/my/documents/file/<t t-esc="file_id"/>/raw';
+
+                    // Set worker source
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+                    var pdfDoc = null,
+                        pageNum = 1,
+                        pageRendering = false,
+                        pageNumPending = null,
+                        scale = 1.0,
+                        canvas = document.getElementById('pdf-canvas'),
+                        ctx = canvas.getContext('2d');
+
+                    function renderPage(num) {
+                        pageRendering = true;
+                        pdfDoc.getPage(num).then(function(page) {
+                            // Calculate scale to fit width
+                            var container = document.getElementById('pdf-viewer-container');
+                            var viewport = page.getViewport({scale: 1});
+                            var containerWidth = container.clientWidth - 20;
+                            var fitScale = containerWidth / viewport.width;
+                            var finalScale = Math.min(fitScale, scale);
+
+                            viewport = page.getViewport({scale: finalScale});
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            var renderContext = {
+                                canvasContext: ctx,
+                                viewport: viewport
+                            };
+
+                            var renderTask = page.render(renderContext);
+                            renderTask.promise.then(function() {
+                                pageRendering = false;
+                                if (pageNumPending !== null) {
+                                    renderPage(pageNumPending);
+                                    pageNumPending = null;
+                                }
+                            });
+                        });
+
+                        document.getElementById('page-num').textContent = num;
+                    }
+
+                    function queueRenderPage(num) {
+                        if (pageRendering) {
+                            pageNumPending = num;
+                        } else {
+                            renderPage(num);
+                        }
+                    }
+
+                    function onPrevPage() {
+                        if (pageNum &lt;= 1) return;
+                        pageNum--;
+                        queueRenderPage(pageNum);
+                    }
+
+                    function onNextPage() {
+                        if (pageNum >= pdfDoc.numPages) return;
+                        pageNum++;
+                        queueRenderPage(pageNum);
+                    }
+
+                    function onZoomIn() {
+                        scale *= 1.25;
+                        queueRenderPage(pageNum);
+                    }
+
+                    function onZoomOut() {
+                        scale /= 1.25;
+                        if (scale &lt; 0.5) scale = 0.5;
+                        queueRenderPage(pageNum);
+                    }
+
+                    document.getElementById('prev-page').addEventListener('click', onPrevPage);
+                    document.getElementById('next-page').addEventListener('click', onNextPage);
+                    document.getElementById('zoom-in').addEventListener('click', onZoomIn);
+                    document.getElementById('zoom-out').addEventListener('click', onZoomOut);
+
+                    // Load PDF
+                    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+                        pdfDoc = pdfDoc_;
+                        document.getElementById('page-count').textContent = pdfDoc.numPages;
+                        renderPage(pageNum);
+                    }).catch(function(error) {
+                        console.error('Error loading PDF:', error);
+                        document.getElementById('pdf-viewer-container').innerHTML =
+                            '<div class="alert alert-danger m-3">Error loading PDF. Please try downloading instead.</div>';
+                    });
+                });
+            </script>
+        </t>
+    </template>
+
 </odoo>

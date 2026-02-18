@@ -210,13 +210,19 @@ class DocumentPortal(CustomerPortal):
             # Not previewable, redirect to download
             return request.redirect(f'/my/documents/file/{file_id}/download')
 
-        # Stream file content directly (works through VPN/proxy)
         if not attachment.datas:
             return request.not_found()
 
-        content = base64.b64decode(attachment.datas)
+        # For PDF, render a viewer page with PDF.js
+        if attachment.mimetype == 'application/pdf':
+            values = {
+                'file': attachment,
+                'file_id': file_id,
+            }
+            return request.render('sh_document_management.portal_pdf_viewer', values)
 
-        # Sanitize filename for Content-Disposition header
+        # For images and text, stream content directly
+        content = base64.b64decode(attachment.datas)
         filename = (attachment.name or 'file').replace('"', '\\"')
 
         headers = [
@@ -224,14 +230,39 @@ class DocumentPortal(CustomerPortal):
             ('Content-Length', len(content)),
             ('X-Content-Type-Options', 'nosniff'),
             ('Cache-Control', 'no-cache'),
+            ('Content-Disposition', f'inline; filename="{filename}"'),
         ]
 
-        # For PDF, use specific handling to ensure proper rendering
-        if attachment.mimetype == 'application/pdf':
-            headers.append(('Content-Disposition', f'inline; filename="{filename}"'))
-            headers.append(('Accept-Ranges', 'bytes'))
-        else:
-            headers.append(('Content-Disposition', f'inline; filename="{filename}"'))
+        return request.make_response(content, headers)
+
+    @http.route(['/my/documents/file/<int:file_id>/raw'],
+                type='http', auth='user', website=True)
+    def portal_file_raw(self, file_id, **kw):
+        """Get raw file content for PDF.js viewer."""
+        attachment = request.env['ir.attachment'].sudo().browse(file_id)
+
+        if not attachment.exists():
+            return request.not_found()
+
+        try:
+            self._check_portal_access_attachment(attachment)
+        except AccessError:
+            return request.not_found()
+
+        if not attachment.datas:
+            return request.not_found()
+
+        content = base64.b64decode(attachment.datas)
+        filename = (attachment.name or 'file').replace('"', '\\"')
+
+        headers = [
+            ('Content-Type', attachment.mimetype or 'application/octet-stream'),
+            ('Content-Length', len(content)),
+            ('X-Content-Type-Options', 'nosniff'),
+            ('Cache-Control', 'no-cache'),
+            ('Content-Disposition', f'inline; filename="{filename}"'),
+            ('Accept-Ranges', 'bytes'),
+        ]
 
         return request.make_response(content, headers)
 
