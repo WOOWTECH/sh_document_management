@@ -3,12 +3,11 @@
 
 import base64
 import io
-import mimetypes
 import zipfile
 import logging
 
 from odoo import http, _
-from odoo.http import request, content_disposition, Response
+from odoo.http import request, content_disposition
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.exceptions import AccessError
 
@@ -184,87 +183,6 @@ class DocumentPortal(CustomerPortal):
             'page_name': 'documents',
         }
         return request.render('sh_document_management.portal_directory_content', values)
-
-    @http.route(['/my/documents/file/<int:file_id>/preview'],
-                type='http', auth='user', website=True)
-    def portal_file_preview(self, file_id, **kw):
-        """Preview a file (PDF, images, text)."""
-        attachment = request.env['ir.attachment'].sudo().browse(file_id)
-
-        if not attachment.exists():
-            return request.not_found()
-
-        try:
-            self._check_portal_access_attachment(attachment)
-        except AccessError:
-            return request.not_found()
-
-        # Check if file is previewable
-        previewable_mimetypes = [
-            'application/pdf',
-            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-            'text/plain',
-        ]
-
-        if attachment.mimetype not in previewable_mimetypes:
-            # Not previewable, redirect to download
-            return request.redirect(f'/my/documents/file/{file_id}/download')
-
-        if not attachment.datas:
-            return request.not_found()
-
-        # For PDF, render a viewer page with PDF.js
-        if attachment.mimetype == 'application/pdf':
-            values = {
-                'file': attachment,
-                'file_id': file_id,
-            }
-            return request.render('sh_document_management.portal_pdf_viewer', values)
-
-        # For images and text, stream content directly
-        content = base64.b64decode(attachment.datas)
-        filename = (attachment.name or 'file').replace('"', '\\"')
-
-        headers = [
-            ('Content-Type', attachment.mimetype or 'application/octet-stream'),
-            ('Content-Length', len(content)),
-            ('X-Content-Type-Options', 'nosniff'),
-            ('Cache-Control', 'no-cache'),
-            ('Content-Disposition', f'inline; filename="{filename}"'),
-        ]
-
-        return request.make_response(content, headers)
-
-    @http.route(['/my/documents/file/<int:file_id>/raw'],
-                type='http', auth='user', website=True)
-    def portal_file_raw(self, file_id, **kw):
-        """Get raw file content for PDF.js viewer."""
-        attachment = request.env['ir.attachment'].sudo().browse(file_id)
-
-        if not attachment.exists():
-            return request.not_found()
-
-        try:
-            self._check_portal_access_attachment(attachment)
-        except AccessError:
-            return request.not_found()
-
-        if not attachment.datas:
-            return request.not_found()
-
-        content = base64.b64decode(attachment.datas)
-        filename = (attachment.name or 'file').replace('"', '\\"')
-
-        headers = [
-            ('Content-Type', attachment.mimetype or 'application/octet-stream'),
-            ('Content-Length', len(content)),
-            ('X-Content-Type-Options', 'nosniff'),
-            ('Cache-Control', 'no-cache'),
-            ('Content-Disposition', f'inline; filename="{filename}"'),
-            ('Accept-Ranges', 'bytes'),
-        ]
-
-        return request.make_response(content, headers)
 
     @http.route(['/my/documents/file/<int:file_id>/download'],
                 type='http', auth='user', website=True)
