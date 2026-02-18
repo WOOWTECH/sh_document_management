@@ -203,11 +203,17 @@ class DocumentPortal(CustomerPortal):
             return request.not_found()
 
         content = base64.b64decode(attachment.datas)
+        filename = attachment.name or 'download'
+
+        # Ensure proper Content-Type for common file types
+        mimetype = attachment.mimetype or 'application/octet-stream'
+
         headers = [
-            ('Content-Type', attachment.mimetype or 'application/octet-stream'),
+            ('Content-Type', mimetype),
             ('Content-Length', len(content)),
-            ('Content-Disposition', content_disposition(attachment.name or 'download')),
+            ('Content-Disposition', content_disposition(filename)),
             ('X-Content-Type-Options', 'nosniff'),
+            ('Cache-Control', 'private, max-age=0'),
         ]
         return request.make_response(content, headers)
 
