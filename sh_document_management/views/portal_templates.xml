@@ -274,8 +274,8 @@
     <!-- File Actions Helper Template - Download only -->
     <template id="file_actions" name="File Actions">
         <a t-attf-href="/my/documents/file/#{file.id}/download"
-           class="btn btn-sm btn-outline-primary" title="Download">
-            <i class="fa fa-download"></i> Download
+           class="btn btn-outline-primary">
+            <i class="fa fa-download me-1"></i> Download
         </a>
     </template>
 
